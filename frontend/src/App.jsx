@@ -5,12 +5,14 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Import Custom Components
+import LandingScreen from './components/LandingScreen';
 import LoginScreen from './components/LoginScreen';
 import Sidebar from './components/Sidebar';
 import DashboardHeader from './components/DashboardHeader';
 import StatCards from './components/StatCards';
 import ChartSection from './components/ChartSection';
 import MapSection from './components/MapSection';
+import DispatchReport from './components/DispatchReport';
 
 // Fix for default Leaflet marker icons in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -51,6 +53,14 @@ const DEPOT_LOCATION = [28.6100, 77.2000];
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem("isLoggedIn") === "true");
+  const [showLanding, setShowLanding] = useState(() => localStorage.getItem("isLoggedIn") !== "true");
+  
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [dispatchLogs, setDispatchLogs] = useState(() => {
+    const saved = localStorage.getItem("dispatchLogs");
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
@@ -67,6 +77,12 @@ export default function App() {
   const [routeCoords, setRouteCoords] = useState([]);
   const [isRouting, setIsRouting] = useState(false);
   const chartRef = useRef(null);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setShowLanding(true);
+    }
+  }, [isLoggedIn]);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -105,6 +121,37 @@ export default function App() {
                 });
                 localStorage.setItem("binHistory", JSON.stringify(newHist));
                 return newHist;
+             });
+
+             // Auto Dispatch Logic
+             setDispatchLogs(prev => {
+                let newLogs = [...prev];
+                let changed = false;
+                
+                Object.values(data).forEach(bin => {
+                   if (bin.Fill_Level >= 95) {
+                      // Check if already dispatched today
+                      const today = new Date().toLocaleDateString();
+                      const alreadyDispatched = newLogs.some(log => log.binId === bin.Bin_ID && log.date === today);
+                      
+                      if (!alreadyDispatched) {
+                         newLogs.unshift({
+                            id: Date.now() + Math.random(),
+                            binId: bin.Bin_ID,
+                            truckNo: `MH-12-SW-${Math.floor(100 + Math.random() * 900)}`,
+                            date: today,
+                            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                         });
+                         changed = true;
+                      }
+                   }
+                });
+                
+                if (changed) {
+                   localStorage.setItem("dispatchLogs", JSON.stringify(newLogs));
+                   return newLogs;
+                }
+                return prev;
              });
           }
         }
@@ -184,6 +231,10 @@ export default function App() {
     setShowRoute(true);
   };
 
+  if (showLanding && !isLoggedIn) {
+    return <LandingScreen onStart={() => setShowLanding(false)} />;
+  }
+
   if (!isLoggedIn) {
     return (
       <LoginScreen 
@@ -191,6 +242,7 @@ export default function App() {
          username={username} setUsername={setUsername}
          password={password} setPassword={setPassword}
          loginError={loginError}
+         onBack={() => setShowLanding(true)}
       />
     );
   }
@@ -220,6 +272,8 @@ export default function App() {
         binsNeedingPickup={binsNeedingPickup}
         getStatusMeaning={getStatusMeaning}
         setIsLoggedIn={setIsLoggedIn}
+        currentView={currentView}
+        setCurrentView={setCurrentView}
       />
 
       <main className="dashboard-container">
@@ -230,26 +284,32 @@ export default function App() {
           activeBin={activeBin}
         />
 
-        <StatCards activeBin={activeBin} />
+        {currentView === 'reports' ? (
+          <DispatchReport dispatchLogs={dispatchLogs} />
+        ) : (
+          <>
+            <StatCards activeBin={activeBin} />
 
-        <div className="grid-charts">
-          <ChartSection 
-             activeHistory={activeHistory} 
-             handleDownloadPdf={handleDownloadPdf} 
-             chartRef={chartRef} 
-          />
+            <div className="grid-charts">
+              <ChartSection 
+                 activeHistory={activeHistory} 
+                 handleDownloadPdf={handleDownloadPdf} 
+                 chartRef={chartRef} 
+              />
 
-          <MapSection 
-             activeBin={activeBin}
-             fleetData={fleetData}
-             showRoute={showRoute}
-             routeCoords={routeCoords}
-             greenIcon={greenIcon}
-             redIcon={redIcon}
-             orangeIcon={orangeIcon}
-             getStatusMeaning={getStatusMeaning}
-          />
-        </div>
+              <MapSection 
+                 activeBin={activeBin}
+                 fleetData={fleetData}
+                 showRoute={showRoute}
+                 routeCoords={routeCoords}
+                 greenIcon={greenIcon}
+                 redIcon={redIcon}
+                 orangeIcon={orangeIcon}
+                 getStatusMeaning={getStatusMeaning}
+              />
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
