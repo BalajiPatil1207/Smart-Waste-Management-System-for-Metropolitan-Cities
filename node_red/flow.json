@@ -48,13 +48,14 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "Process Bin Data",
-        "func": "let data = msg.payload;\n\nlet status = \"Normal\";\nif(data.Fill_Level > 80) {\n    status = \"Critical Full\";\n} else if(data.Methane_PPM > 350) {\n    status = \"Toxic Odor\";\n} else if(data.Battery_Level < 20) {\n    status = \"Low Battery\";\n} else if(data.Fill_Level > 50) {\n    status = \"Moderate\";\n} else {\n    status = \"Empty\";\n}\ndata.Status = status;\nmsg.payload = data;\nmsg.topic = data.Bin_ID;\nreturn msg;",
+        "func": "let data = msg.payload;\n\nlet status = \"Normal\";\nif(data.Fill_Level > 80) {\n    status = \"Critical Full\";\n} else if(data.Methane_PPM > 350) {\n    status = \"Toxic Odor\";\n} else if(data.Battery_Level < 20) {\n    status = \"Low Battery\";\n} else if(data.Fill_Level > 50) {\n    status = \"Moderate\";\n} else {\n    status = \"Empty\";\n}\ndata.Status = status;\n\nlet fleet = global.get('fleetData') || {};\nfleet[data.Bin_ID] = data;\nglobal.set('fleetData', fleet);\n\nmsg.payload = data;\nmsg.topic = data.Bin_ID;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 350,
         "y": 200,
         "wires": [
             [
+                "4",
                 "6",
                 "7",
                 "battery_gauge",
@@ -62,9 +63,40 @@
                 "11",
                 "filter_level",
                 "filter_temp",
-                "10"
+                "10",
+                "9"
             ]
         ]
+    },
+    {
+        "id": "4",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Format for Cloudant",
+        "func": "msg.payload = {\n    Bin_ID: msg.payload.Bin_ID,\n    Latitude: msg.payload.Latitude,\n    Longitude: msg.payload.Longitude,\n    Fill_Level: msg.payload.Fill_Level,\n    Temperature: msg.payload.Temperature,\n    Methane_PPM: msg.payload.Methane_PPM,\n    Battery_Level: msg.payload.Battery_Level,\n    Timestamp: msg.payload.Timestamp,\n    Status: msg.payload.Status\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 580,
+        "y": 80,
+        "wires": [
+            [
+                "5"
+            ]
+        ]
+    },
+    {
+        "id": "5",
+        "type": "cloudant out",
+        "z": "f6f2187d.f17ca8",
+        "name": "Cloudant DB",
+        "cloudant": "dummy_cloudant_cfg",
+        "database": "waste_management",
+        "service": "waste_management_service",
+        "payonly": true,
+        "operation": "insert",
+        "x": 810,
+        "y": 80,
+        "wires": []
     },
     {
         "id": "6",
@@ -344,11 +376,73 @@
         "wires": []
     },
     {
+        "id": "9",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "SMS Alert Trigger",
+        "func": "if(msg.payload.Fill_Level > 80) {\n    let alertMsg = `ALERT: Waste Bin ${msg.payload.Bin_ID} is at ${msg.payload.Fill_Level}% capacity. Immediate collection required.`;\n    \n    msg.headers = {\n        \"authorization\": \"YOUR_FAST2SMS_API_KEY\",\n        \"Content-Type\": \"application/x-www-form-urlencoded\"\n    };\n    \n    msg.payload = {\n        \"route\": \"v3\",\n        \"sender_id\": \"FTWSMS\",\n        \"message\": alertMsg,\n        \"language\": \"english\",\n        \"flash\": 0,\n        \"numbers\": \"YOUR_MOBILE_NUMBER\"\n    };\n    \n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 590,
+        "y": 620,
+        "wires": [
+            [
+                "12"
+            ]
+        ]
+    },
+    {
+        "id": "12",
+        "type": "http request",
+        "z": "f6f2187d.f17ca8",
+        "name": "Send SMS (Fast2SMS)",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://www.fast2sms.com/dev/bulkV2",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 840,
+        "y": 620,
+        "wires": [
+            [
+                "14"
+            ]
+        ]
+    },
+    {
+        "id": "14",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "SMS Response",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1060,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "dashboard_group_control",
+        "type": "ui_group",
+        "name": "Device Connectivity",
+        "tab": "dashboard_tab1",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
         "id": "dashboard_group1",
         "type": "ui_group",
         "name": "Garbage & Environment",
         "tab": "dashboard_tab1",
-        "order": 1,
+        "order": 2,
         "disp": true,
         "width": "6",
         "collapse": false
@@ -358,7 +452,7 @@
         "type": "ui_group",
         "name": "Device Health & Safety",
         "tab": "dashboard_tab1",
-        "order": 2,
+        "order": 3,
         "disp": true,
         "width": "6",
         "collapse": false
@@ -391,6 +485,33 @@
         "disabled": false
     },
     {
+        "id": "ui_btn_trigger",
+        "type": "ui_button",
+        "z": "f6f2187d.f17ca8",
+        "name": "Ping Device",
+        "group": "dashboard_group_control",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "📡 Ping IoT Device (Force Sync)",
+        "tooltip": "Send command to NodeMCU to fetch latest data",
+        "color": "white",
+        "bgcolor": "#1e3c72",
+        "icon": "settings_input_antenna",
+        "payload": "",
+        "payloadType": "date",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 130,
+        "y": 320,
+        "wires": [
+            [
+                "dummy_gen"
+            ]
+        ]
+    },
+    {
         "id": "dummy_inject",
         "type": "inject",
         "z": "f6f2187d.f17ca8",
@@ -400,7 +521,7 @@
                 "p": "payload"
             }
         ],
-        "repeat": "3",
+        "repeat": "",
         "crontab": "",
         "once": true,
         "onceDelay": 0.1,
@@ -420,11 +541,11 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "Generate Stable Bin Data",
-        "func": "let bin1 = {\n    payload: {\n        Bin_ID: \"BIN001\",\n        Latitude: 28.6139 + (Math.random() * 0.002 - 0.001),\n        Longitude: 77.2090 + (Math.random() * 0.002 - 0.001),\n        Fill_Level: Math.floor(Math.random() * 15) + 60, // Stable around 60-75%\n        Temperature: Math.floor(Math.random() * 5) + 30, // Stable around 30-35 C\n        Battery_Level: 85, // Stable battery\n        Methane_PPM: Math.floor(Math.random() * 50) + 100, // Stable Odor\n        Timestamp: new Date().toISOString()\n    }\n};\n\nreturn bin1;",
+        "func": "let bins = [\n    {id: \"BIN001\", lat: 28.6139, lon: 77.2090},\n    {id: \"BIN002\", lat: 28.6230, lon: 77.2150},\n    {id: \"BIN003\", lat: 28.6050, lon: 77.1950}\n];\n\nlet results = bins.map(b => {\n    let fill = Math.floor(Math.random() * 100);\n    let gas = Math.floor(Math.random() * 300) + 50;\n    let bat = Math.floor(Math.random() * 40) + 60;\n    \n    let status = \"Normal\";\n    if(fill > 80) status = \"Critical Full\";\n    else if(gas > 350) status = \"Toxic Odor\";\n    else if(bat < 20) status = \"Low Battery\";\n    else if(fill > 50) status = \"Moderate\";\n    else status = \"Empty\";\n\n    return {\n        Bin_ID: b.id,\n        Latitude: b.lat + (Math.random() * 0.001 - 0.0005),\n        Longitude: b.lon + (Math.random() * 0.001 - 0.0005),\n        Fill_Level: fill,\n        Temperature: Math.floor(Math.random() * 15) + 30,\n        Battery_Level: bat,\n        Methane_PPM: gas,\n        Timestamp: new Date().toISOString(),\n        Status: status\n    };\n});\n\nlet fleet = global.get('fleetData') || {};\nresults.forEach(d => fleet[d.Bin_ID] = d);\nglobal.set('fleetData', fleet);\n\nreturn [[ {payload: results[0]}, {payload: results[1]}, {payload: results[2]} ]];",
         "outputs": 1,
         "noerr": 0,
-        "x": 150,
-        "y": 320,
+        "x": 370,
+        "y": 300,
         "wires": [
             [
                 "3"
@@ -440,7 +561,7 @@
         "order": 0,
         "width": 0,
         "height": 0,
-        "format": "<script>\n    setTimeout(function() {\n        // Change Top Bar Title\n        var toolbarTitle = document.querySelector('md-toolbar .md-toolbar-tools h1');\n        if(toolbarTitle) {\n            toolbarTitle.innerHTML = '🏙️ Smart Waste Management System for Metropolitan Cities';\n        }\n    }, 500);\n</script>\n<style>\n    /* Make the toolbar look premium */\n    md-toolbar {\n        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;\n    }\n    .md-toolbar-tools h1 {\n        font-size: 22px !important;\n        font-weight: bold !important;\n    }\n</style>",
+        "format": "<style>\n    /* Make the toolbar look premium */\n    md-toolbar {\n        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;\n    }\n    \n    /* Hide the default title and inject the custom one */\n    .md-toolbar-tools h1.ng-binding {\n        visibility: hidden;\n        position: relative;\n    }\n    .md-toolbar-tools h1.ng-binding::after {\n        content: '🏙️ Smart Waste Management System for Metropolitan Cities';\n        visibility: visible;\n        position: absolute;\n        left: 0;\n        top: 0;\n        font-size: 22px !important;\n        font-weight: bold !important;\n        width: 800px;\n    }\n</style>",
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resizes": true,
@@ -450,5 +571,104 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "dummy_cloudant_cfg",
+        "type": "cloudant",
+        "host": "localhost",
+        "name": "Dummy Cloudant Config"
+    },
+    {
+        "id": "api_in_bins",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "API GET /api/bins",
+        "url": "/api/bins",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 420,
+        "wires": [
+            [
+                "api_func_bins"
+            ]
+        ]
+    },
+    {
+        "id": "api_func_bins",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Return Latest Bin Data",
+        "func": "msg.payload = global.get('fleetData') || {};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 360,
+        "y": 420,
+        "wires": [
+            [
+                "api_out_bins"
+            ]
+        ]
+    },
+    {
+        "id": "api_out_bins",
+        "type": "http response",
+        "z": "f6f2187d.f17ca8",
+        "name": "Send JSON Response",
+        "statusCode": "200",
+        "headers": {
+            "content-type": "application/json"
+        },
+        "x": 600,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "api_in_trigger",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "API GET /api/trigger",
+        "url": "/api/trigger",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 480,
+        "wires": [
+            [
+                "dummy_gen",
+                "trigger_func"
+            ]
+        ]
+    },
+    {
+        "id": "trigger_func",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Return Success",
+        "func": "msg.payload = { success: true };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 360,
+        "y": 520,
+        "wires": [
+            [
+                "api_out_trigger"
+            ]
+        ]
+    },
+    {
+        "id": "api_out_trigger",
+        "type": "http response",
+        "z": "f6f2187d.f17ca8",
+        "name": "Send JSON Response",
+        "statusCode": "200",
+        "headers": {
+            "content-type": "application/json"
+        },
+        "x": 600,
+        "y": 520,
+        "wires": []
     }
 ]
