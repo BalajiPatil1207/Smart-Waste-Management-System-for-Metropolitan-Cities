@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Server, Route } from 'lucide-react';
+import { Server, Route, LayoutDashboard, ClipboardList } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
 
 export default function Sidebar({
@@ -11,15 +11,47 @@ export default function Sidebar({
     isRouting, 
     binsNeedingPickup, 
     getStatusMeaning,
-    setIsLoggedIn
+    setIsLoggedIn,
+    currentView,
+    setCurrentView
 }) {
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     return (
         <aside className="fleet-sidebar glass-panel">
-            <h2 className="sidebar-title"><Server size={24} color="#38bdf8"/> Fleet Management</h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: '1.5' }}>
-                Select a Smart Bin from the list below to monitor its real-time analytics, fill status, and live map location.
+            <h2 className="sidebar-title" style={{ marginBottom: '1.5rem' }}><Server size={24} color="#38bdf8"/> Fleet Management</h2>
+            
+            {/* Navigation Menu */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <button 
+                onClick={() => setCurrentView('dashboard')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px', padding: '0.8rem', borderRadius: '8px',
+                  background: currentView === 'dashboard' ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+                  border: currentView === 'dashboard' ? '1px solid #38bdf8' : '1px solid transparent',
+                  color: currentView === 'dashboard' ? '#38bdf8' : '#94a3b8',
+                  cursor: 'pointer', transition: 'all 0.2s', fontWeight: '600'
+                }}
+              >
+                <LayoutDashboard size={18} /> Live Dashboard
+              </button>
+
+              <button 
+                onClick={() => setCurrentView('reports')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px', padding: '0.8rem', borderRadius: '8px',
+                  background: currentView === 'reports' ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+                  border: currentView === 'reports' ? '1px solid #38bdf8' : '1px solid transparent',
+                  color: currentView === 'reports' ? '#38bdf8' : '#94a3b8',
+                  cursor: 'pointer', transition: 'all 0.2s', fontWeight: '600'
+                }}
+              >
+                <ClipboardList size={18} /> Dispatch Reports
+              </button>
+            </div>
+
+            <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '1rem', lineHeight: '1.5' }}>
+                Select a Smart Bin to monitor real-time analytics and map location.
             </p>
 
             <button 
