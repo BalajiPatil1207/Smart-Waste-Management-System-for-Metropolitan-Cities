@@ -1,0 +1,596 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Smart Waste Management",
+        "disabled": false,
+        "info": "Enhanced flow for Smart Waste Management System connecting IBM IoT to Cloudant, Dashboard, World Map and SMS."
+    },
+    {
+        "id": "1",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "Receive Bin Data",
+        "topic": "iot-2/type/NodeMCU/id/+/evt/status/fmt/json",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "ibm_iot_broker",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 120,
+        "y": 140,
+        "wires": [
+            [
+                "2",
+                "3"
+            ]
+        ]
+    },
+    {
+        "id": "ibm_iot_broker",
+        "type": "mqtt-broker",
+        "name": "IBM Watson IoT",
+        "broker": "YOUR_ORG_ID.messaging.internetofthings.ibmcloud.com",
+        "port": "1883",
+        "clientid": "a:YOUR_ORG_ID:SmartWasteApp",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "2",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "Debug Data",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 350,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "3",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Process Bin Data",
+        "func": "let data = msg.payload;\n\nlet status = \"Normal\";\nif(data.Fill_Level > 80) {\n    status = \"Critical Full\";\n} else if(data.Methane_PPM > 350) {\n    status = \"Toxic Odor!\";\n} else if(data.Battery_Level < 20) {\n    status = \"Low Battery\";\n} else if(data.Fill_Level > 50) {\n    status = \"Moderate\";\n} else {\n    status = \"Normal (Empty)\";\n}\ndata.Status = status;\nmsg.payload = data;\nmsg.topic = data.Bin_ID;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 350,
+        "y": 200,
+        "wires": [
+            [
+                "4",
+                "6",
+                "7",
+                "battery_gauge",
+                "gas_gauge",
+                "9",
+                "10",
+                "11",
+                "filter_level",
+                "filter_temp",
+                "bar_chart_filter"
+            ]
+        ]
+    },
+    {
+        "id": "4",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Format for Cloudant",
+        "func": "msg.payload = {\n    Bin_ID: msg.payload.Bin_ID,\n    Latitude: msg.payload.Latitude,\n    Longitude: msg.payload.Longitude,\n    Fill_Level: msg.payload.Fill_Level,\n    Temperature: msg.payload.Temperature,\n    Methane_PPM: msg.payload.Methane_PPM,\n    Battery_Level: msg.payload.Battery_Level,\n    Timestamp: msg.payload.Timestamp,\n    Status: msg.payload.Status\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 580,
+        "y": 80,
+        "wires": [
+            [
+                "5"
+            ]
+        ]
+    },
+    {
+        "id": "5",
+        "type": "cloudant out",
+        "z": "f6f2187d.f17ca8",
+        "name": "Cloudant DB",
+        "cloudant": "dummy_cloudant_cfg",
+        "database": "waste_management",
+        "service": "waste_management_service",
+        "payonly": true,
+        "operation": "insert",
+        "x": 810,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "6",
+        "type": "ui_gauge",
+        "z": "f6f2187d.f17ca8",
+        "name": "Latest Waste Level",
+        "group": "dashboard_group1",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Latest Bin Level (%)",
+        "label": "%",
+        "format": "{{msg.payload.Fill_Level}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "50",
+        "seg2": "80",
+        "x": 610,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "7",
+        "type": "ui_gauge",
+        "z": "f6f2187d.f17ca8",
+        "name": "Latest Temperature",
+        "group": "dashboard_group1",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Latest Temp (°C)",
+        "label": "C",
+        "format": "{{msg.payload.Temperature}}",
+        "min": "0",
+        "max": "60",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "35",
+        "seg2": "45",
+        "x": 610,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "battery_gauge",
+        "type": "ui_gauge",
+        "z": "f6f2187d.f17ca8",
+        "name": "Battery Level",
+        "group": "dashboard_group3",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Device Battery (%)",
+        "label": "%",
+        "format": "{{msg.payload.Battery_Level}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#ca3838",
+            "#e6e600",
+            "#00b500"
+        ],
+        "seg1": "20",
+        "seg2": "50",
+        "x": 590,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "gas_gauge",
+        "type": "ui_gauge",
+        "z": "f6f2187d.f17ca8",
+        "name": "Methane Gas Level",
+        "group": "dashboard_group3",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Odor / Methane (PPM)",
+        "label": "PPM",
+        "format": "{{msg.payload.Methane_PPM}}",
+        "min": 0,
+        "max": "500",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "150",
+        "seg2": "350",
+        "x": 610,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "filter_level",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Extract Fill Level",
+        "func": "msg.payload = msg.payload.Fill_Level;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 580,
+        "y": 380,
+        "wires": [
+            [
+                "8"
+            ]
+        ]
+    },
+    {
+        "id": "8",
+        "type": "ui_chart",
+        "z": "f6f2187d.f17ca8",
+        "name": "Level Over Time",
+        "group": "dashboard_group2",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Live Fill Level History (All Bins)",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 800,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "filter_temp",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Extract Temp",
+        "func": "msg.payload = msg.payload.Temperature;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 570,
+        "y": 440,
+        "wires": [
+            [
+                "new_temp_chart"
+            ]
+        ]
+    },
+    {
+        "id": "new_temp_chart",
+        "type": "ui_chart",
+        "z": "f6f2187d.f17ca8",
+        "name": "Temperature Over Time",
+        "group": "dashboard_group2",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Live Temperature History (°C)",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#d62728",
+            "#ff7f0e",
+            "#1f77b4",
+            "#2ca02c"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 830,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bar_chart_filter",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Extract Bar Data",
+        "func": "msg.payload = msg.payload.Fill_Level;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 580,
+        "y": 500,
+        "wires": [
+            [
+                "bar_chart_node"
+            ]
+        ]
+    },
+    {
+        "id": "bar_chart_node",
+        "type": "ui_chart",
+        "z": "f6f2187d.f17ca8",
+        "name": "Comparison Bar Chart",
+        "group": "dashboard_group2",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "label": "Current Levels Comparison",
+        "chartType": "bar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 820,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "SMS Alert Trigger",
+        "func": "if(msg.payload.Fill_Level > 80) {\n    let alertMsg = `ALERT: Waste Bin ${msg.payload.Bin_ID} is at ${msg.payload.Fill_Level}% capacity. Immediate collection required.`;\n    \n    msg.headers = {\n        \"authorization\": \"YOUR_FAST2SMS_API_KEY\",\n        \"Content-Type\": \"application/x-www-form-urlencoded\"\n    };\n    \n    msg.payload = {\n        \"route\": \"v3\",\n        \"sender_id\": \"FTWSMS\",\n        \"message\": alertMsg,\n        \"language\": \"english\",\n        \"flash\": 0,\n        \"numbers\": \"YOUR_MOBILE_NUMBER\"\n    };\n    \n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 590,
+        "y": 560,
+        "wires": [
+            [
+                "12"
+            ]
+        ]
+    },
+    {
+        "id": "10",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Map Marker Formatting",
+        "func": "let p = msg.payload;\nmsg.payload = {\n    name: p.Bin_ID,\n    lat: p.Latitude,\n    lon: p.Longitude,\n    icon: \"trash\",\n    iconColor: p.Fill_Level > 80 ? \"red\" : (p.Fill_Level > 50 ? \"orange\" : \"green\"),\n    extrainfo: `<b>Bin ID:</b> ${p.Bin_ID} <br/> <b>Fill Level:</b> ${p.Fill_Level}% <br/> <b>Temp:</b> ${p.Temperature}°C <br/> <b>Battery:</b> ${p.Battery_Level}% <br/> <b>Gas:</b> ${p.Methane_PPM} PPM <br/> <b>Status:</b> ${p.Status}`\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 620,
+        "wires": [
+            [
+                "13"
+            ]
+        ]
+    },
+    {
+        "id": "11",
+        "type": "ui_text",
+        "z": "f6f2187d.f17ca8",
+        "group": "dashboard_group1",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "Bin Status",
+        "label": "Latest Status:",
+        "format": "<b>{{msg.payload.Bin_ID}}:</b> {{msg.payload.Status}}",
+        "layout": "row-spread",
+        "x": 570,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "12",
+        "type": "http request",
+        "z": "f6f2187d.f17ca8",
+        "name": "Send SMS (Fast2SMS)",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://www.fast2sms.com/dev/bulkV2",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 840,
+        "y": 560,
+        "wires": [
+            [
+                "14"
+            ]
+        ]
+    },
+    {
+        "id": "13",
+        "type": "worldmap",
+        "z": "f6f2187d.f17ca8",
+        "name": "Live City Map",
+        "lat": "28.6139",
+        "lon": "77.2090",
+        "zoom": "11",
+        "layer": "OSM",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "none",
+        "showlines": "false",
+        "trackpoints": "false",
+        "maxpoints": "20",
+        "mapname": "",
+        "dynamiclock": "false",
+        "path": "/worldmap",
+        "x": 800,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "14",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "SMS Response",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1060,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "dashboard_group1",
+        "type": "ui_group",
+        "name": "Live Status Summary",
+        "tab": "dashboard_tab1",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "dashboard_group3",
+        "type": "ui_group",
+        "name": "Health & Safety Sensors",
+        "tab": "dashboard_tab1",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "dashboard_group2",
+        "type": "ui_group",
+        "name": "Smart City Analytics",
+        "tab": "dashboard_tab2",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "dashboard_tab1",
+        "type": "ui_tab",
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "dashboard_tab2",
+        "type": "ui_tab",
+        "name": "Analytics",
+        "icon": "bar_chart",
+        "order": 2,
+        "disabled": false
+    },
+    {
+        "id": "dummy_inject",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Start Dummy Data",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "3",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 260,
+        "wires": [
+            [
+                "dummy_gen"
+            ]
+        ]
+    },
+    {
+        "id": "dummy_gen",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Generate Multi-Bin Data",
+        "func": "let bin1 = {\n    payload: {\n        Bin_ID: \"BIN001\",\n        Latitude: 28.6139 + (Math.random() * 0.02 - 0.01),\n        Longitude: 77.2090 + (Math.random() * 0.02 - 0.01),\n        Fill_Level: Math.floor(Math.random() * 100),\n        Temperature: Math.floor(Math.random() * 15) + 30,\n        Battery_Level: Math.floor(Math.random() * 40) + 60, // 60-100%\n        Methane_PPM: Math.floor(Math.random() * 200) + 50,\n        Timestamp: new Date().toISOString()\n    }\n};\n\nlet bin2 = {\n    payload: {\n        Bin_ID: \"BIN002\",\n        Latitude: 28.5355 + (Math.random() * 0.02 - 0.01),\n        Longitude: 77.2410 + (Math.random() * 0.02 - 0.01),\n        Fill_Level: Math.floor(Math.random() * 100),\n        Temperature: Math.floor(Math.random() * 15) + 25,\n        Battery_Level: Math.floor(Math.random() * 30) + 10, // 10-40%\n        Methane_PPM: Math.floor(Math.random() * 300) + 150,\n        Timestamp: new Date().toISOString()\n    }\n};\n\nlet bin3 = {\n    payload: {\n        Bin_ID: \"BIN003\",\n        Latitude: 28.7041 + (Math.random() * 0.02 - 0.01),\n        Longitude: 77.1025 + (Math.random() * 0.02 - 0.01),\n        Fill_Level: Math.floor(Math.random() * 100),\n        Temperature: Math.floor(Math.random() * 15) + 28,\n        Battery_Level: Math.floor(Math.random() * 50) + 50, // 50-100%\n        Methane_PPM: Math.floor(Math.random() * 100) + 20,\n        Timestamp: new Date().toISOString()\n    }\n};\n\n// Send all 3 bin data simultaneously\nreturn [[bin1, bin2, bin3]];",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 150,
+        "y": 320,
+        "wires": [
+            [
+                "2",
+                "3"
+            ]
+        ]
+    },
+    {
+        "id": "dummy_cloudant_cfg",
+        "type": "cloudant",
+        "host": "localhost",
+        "name": "Dummy Cloudant Config"
+    }
+]

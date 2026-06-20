@@ -1,0 +1,2 @@
+wiotp-sdk==1.0.1
+requests
