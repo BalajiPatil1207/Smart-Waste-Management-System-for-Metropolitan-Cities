@@ -1,24 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Lock, User, Key, Leaf } from 'lucide-react';
+import { Lock, User, Key, ArrowLeft } from 'lucide-react';
 
-export default function LoginScreen({ handleLogin, username, setUsername, password, setPassword, loginError }) {
+export default function LoginScreen({ handleLogin, username, setUsername, password, setPassword, loginError, onBack }) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    // Trigger animation after mount
     setTimeout(() => setLoaded(true), 100);
   }, []);
 
   return (
     <div className="landing-page">
-      {/* Background Image is set in CSS */}
       <div className="landing-overlay"></div>
       
       <div className={`landing-content ${loaded ? 'fade-in-up' : ''}`}>
-        <div className="brand-title">
-          <Leaf size={48} color="#34d399" className="floating-icon" />
-          <h1 className="gradient-text">EcoSmart Metropolis</h1>
-          <p>Next-Generation Autonomous Waste Management</p>
+        
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', marginBottom: '-1rem' }}>
+          <button 
+            onClick={onBack}
+            style={{ 
+              background: 'transparent', border: 'none', color: '#94a3b8', 
+              display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer',
+              fontSize: '1rem'
+            }}
+          >
+            <ArrowLeft size={18} /> Back
+          </button>
         </div>
 
         <div className="glass-panel login-box premium-shadow">
