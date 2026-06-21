@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ClipboardList, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ClipboardList, CheckCircle, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 
 export default function DispatchReport({ dispatchLogs }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -9,14 +9,49 @@ export default function DispatchReport({ dispatchLogs }) {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentLogs = dispatchLogs.slice(startIndex, startIndex + itemsPerPage);
 
+  const downloadCSV = () => {
+    if (dispatchLogs.length === 0) return;
+    const headers = ["Sr. No", "Bin ID", "Truck Number", "Date", "Time", "Status"];
+    const csvRows = [headers.join(",")];
+    
+    dispatchLogs.forEach((log, index) => {
+      const srNo = dispatchLogs.length - index;
+      const row = [srNo, log.binId, log.truckNo, log.date, log.time, "Dispatched"];
+      csvRows.push(row.join(","));
+    });
+    
+    const blob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Dispatch_Report_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="glass-panel" style={{ padding: '2rem', minHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-      <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', color: '#38bdf8' }}>
-        <ClipboardList size={28} /> Automated Dispatch History
-      </h2>
-      <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>
-        This report logs all automatically dispatched trucks when bins reach critical fill levels (≥ 95%).
-      </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div>
+              <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#38bdf8', marginBottom: '0.5rem' }}>
+                <ClipboardList size={28} /> Automated Dispatch History
+              </h2>
+              <p style={{ color: '#94a3b8', margin: 0 }}>
+                This report logs all automatically dispatched trucks when bins reach critical fill levels (≥ 95%).
+              </p>
+          </div>
+          
+          {dispatchLogs.length > 0 && (
+              <button 
+                onClick={downloadCSV} 
+                className="ping-btn" 
+                style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                  <Download size={18}/> Export Full Report (CSV)
+              </button>
+          )}
+      </div>
 
       {dispatchLogs.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b', fontSize: '1.2rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
