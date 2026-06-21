@@ -19,7 +19,7 @@ export default function ChartSection({ activeHistory, handleDownloadPdf, chartRe
                             <linearGradient id="colorGas" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#34d399" stopOpacity={0.8} /><stop offset="95%" stopColor="#34d399" stopOpacity={0} /></linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                        <XAxis dataKey="time" stroke="#94a3b8" fontSize={12} />
+                        <XAxis dataKey="time" stroke="#94a3b8" fontSize={12} tickFormatter={(tick) => typeof tick === 'string' ? tick.replace(/:\d{2}\s/, ' ') : tick} />
                         <YAxis stroke="#94a3b8" yAxisId="left" />
                         <YAxis stroke="#94a3b8" yAxisId="right" orientation="right" />
                         <RechartsTooltip contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px' }} />
