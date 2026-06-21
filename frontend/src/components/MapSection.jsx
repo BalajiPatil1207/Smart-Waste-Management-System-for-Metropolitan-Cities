@@ -21,11 +21,41 @@ export default function MapSection({
     greenIcon, 
     redIcon, 
     orangeIcon, 
-    getStatusMeaning 
+    getStatusMeaning,
+    isFullMap,
+    setIsFullMap
 }) {
     return (
-        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column' }}>
-            <div className="chart-title"><AlertTriangle size={20} color="#fbbf24" /> Live Map Tracking</div>
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', height: isFullMap ? 'calc(100vh - 180px)' : 'auto' }}>
+            <div className="chart-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <AlertTriangle size={20} color="#fbbf24" /> Live Map Tracking
+                </span>
+                <button 
+                  onClick={() => setIsFullMap(!isFullMap)} 
+                  style={{ 
+                    padding: '6px 12px', 
+                    background: 'rgba(56, 189, 248, 0.1)', 
+                    border: '1px solid #38bdf8', 
+                    borderRadius: '6px', 
+                    color: '#38bdf8', 
+                    fontWeight: '600', 
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = '#38bdf8';
+                    e.target.style.color = '#0f172a';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'rgba(56, 189, 248, 0.1)';
+                    e.target.style.color = '#38bdf8';
+                  }}
+                >
+                  {isFullMap ? 'Back to Dashboard' : 'View Full Map'}
+                </button>
+            </div>
             <div className="map-wrapper" style={{ flexGrow: 1, borderRadius: '12px', overflow: 'hidden', minHeight: '300px' }}>
                 <MapContainer center={[activeBin.Latitude, activeBin.Longitude]} zoom={14} style={{ height: '100%', width: '100%' }}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
