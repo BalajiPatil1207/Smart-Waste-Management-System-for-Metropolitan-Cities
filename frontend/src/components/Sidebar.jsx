@@ -37,6 +37,7 @@ export default function Sidebar({
               </button>
 
               <button 
+                id="tour-reports"
                 onClick={() => setCurrentView('reports')}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '10px', padding: '0.8rem', borderRadius: '8px',
@@ -55,6 +56,7 @@ export default function Sidebar({
             </p>
 
             <button 
+                id="tour-route"
                 className={`route-btn ${showRoute ? 'active' : ''}`} 
                 onClick={toggleRoute}
                 disabled={isRouting}
@@ -66,7 +68,7 @@ export default function Sidebar({
                 <div style={{ color: '#34d399', fontSize: '0.85rem', marginBottom: '1rem' }}>No bins need immediate pickup!</div>
             )}
 
-            <div className="bin-list">
+            <div className="bin-list" id="tour-bins">
                 {Object.values(fleetData).map(bin => {
                     let dotColor = "#34d399";
                     if(bin.Fill_Level > 80 || bin.Methane_PPM > 350) dotColor = "#f87171";
