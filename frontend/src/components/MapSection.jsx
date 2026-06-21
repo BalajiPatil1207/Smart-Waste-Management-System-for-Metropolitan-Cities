@@ -32,6 +32,7 @@ export default function MapSection({
                     <AlertTriangle size={20} color="#fbbf24" /> Live Map Tracking
                 </span>
                 <button 
+                  id="tour-fullmap"
                   onClick={() => setIsFullMap(!isFullMap)} 
                   style={{ 
                     padding: '6px 12px', 
