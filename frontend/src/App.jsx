@@ -76,6 +76,7 @@ export default function App() {
   const [showRoute, setShowRoute] = useState(false);
   const [routeCoords, setRouteCoords] = useState([]);
   const [isRouting, setIsRouting] = useState(false);
+  const [isFullMap, setIsFullMap] = useState(false);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -286,6 +287,19 @@ export default function App() {
 
         {currentView === 'reports' ? (
           <DispatchReport dispatchLogs={dispatchLogs} />
+        ) : isFullMap ? (
+          <MapSection 
+             activeBin={activeBin}
+             fleetData={fleetData}
+             showRoute={showRoute}
+             routeCoords={routeCoords}
+             greenIcon={greenIcon}
+             redIcon={redIcon}
+             orangeIcon={orangeIcon}
+             getStatusMeaning={getStatusMeaning}
+             isFullMap={isFullMap}
+             setIsFullMap={setIsFullMap}
+          />
         ) : (
           <>
             <StatCards activeBin={activeBin} />
@@ -306,6 +320,8 @@ export default function App() {
                  redIcon={redIcon}
                  orangeIcon={orangeIcon}
                  getStatusMeaning={getStatusMeaning}
+                 isFullMap={isFullMap}
+                 setIsFullMap={setIsFullMap}
               />
             </div>
           </>
