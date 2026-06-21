@@ -3,6 +3,9 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { HelpCircle } from 'lucide-react';
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 // Import Custom Components
 import LandingScreen from './components/LandingScreen';
@@ -232,6 +235,20 @@ export default function App() {
     setShowRoute(true);
   };
 
+  const startTour = () => {
+    const driverObj = driver({
+      showProgress: true,
+      animate: true,
+      steps: [
+        { element: '#tour-bins', popover: { title: 'Smart Bins', description: 'These are your active IoT bins. Select one to view its live fill level and odor data in the dashboard.', side: "right", align: 'start' }},
+        { element: '#tour-reports', popover: { title: 'Dispatch Reports', description: 'View the history of all automatically dispatched garbage trucks and download full CSV reports.', side: "right", align: 'start' }},
+        { element: '#tour-route', popover: { title: 'Optimize Truck Route', description: 'Automatically calculates the shortest driving path using OpenStreetMap to pick up only the full bins.', side: "right", align: 'start' }},
+        { element: '#tour-fullmap', popover: { title: 'Full Screen Map', description: 'Expand the map to get a larger view of your fleet locations and calculated truck routes.', side: "left", align: 'start' }}
+      ]
+    });
+    driverObj.drive();
+  };
+
   if (showLanding && !isLoggedIn) {
     return <LandingScreen onStart={() => setShowLanding(false)} />;
   }
@@ -327,6 +344,10 @@ export default function App() {
           </>
         )}
       </main>
+
+      <button className="help-fab" onClick={startTour} title="Start Guided Tour">
+        <HelpCircle size={30} />
+      </button>
     </div>
   );
 }
