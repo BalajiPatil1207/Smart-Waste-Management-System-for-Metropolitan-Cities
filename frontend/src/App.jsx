@@ -134,9 +134,13 @@ export default function App() {
                 
                 Object.values(data).forEach(bin => {
                    if (bin.Fill_Level >= 95) {
-                      // Check if already dispatched today
+                      // Check if already dispatched recently (1 minute cooldown for simulation)
                       const today = new Date().toLocaleDateString();
-                      const alreadyDispatched = newLogs.some(log => log.binId === bin.Bin_ID && log.date === today);
+                      const alreadyDispatched = newLogs.some(log => {
+                          if (log.binId !== bin.Bin_ID) return false;
+                          if (!log.timestamp) return false; // Ignore old logs without timestamps
+                          return (Date.now() - log.timestamp) < 60000; // 60 seconds cooldown
+                      });
                       
                       if (!alreadyDispatched) {
                          newLogs.unshift({
@@ -144,7 +148,8 @@ export default function App() {
                             binId: bin.Bin_ID,
                             truckNo: `MH-12-SW-${Math.floor(100 + Math.random() * 900)}`,
                             date: today,
-                            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                            timestamp: Date.now()
                          });
                          changed = true;
                       }
