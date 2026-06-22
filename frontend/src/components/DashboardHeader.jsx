@@ -43,9 +43,9 @@ export default function DashboardHeader({ handlePingDevice, statusClass, getStat
                   title={isHardwareOnline ? "Receiving live telemetry from NodeMCU/Sensors" : "Connection lost! Check device power and Wi-Fi."}
                 >
                     {isHardwareOnline ? (
-                        <><Wifi size={16} /> Hardware: Online</>
+                        <><Wifi size={16} /> Device: Online</>
                     ) : (
-                        <><WifiOff size={16} /> Hardware: Offline</>
+                        <><WifiOff size={16} /> Device: Offline</>
                     )}
                 </div>
 
