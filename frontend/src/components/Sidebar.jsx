@@ -69,7 +69,7 @@ export default function Sidebar({
             )}
 
             <div className="bin-list" id="tour-bins">
-                {Object.values(fleetData).map(bin => {
+                {Object.values(fleetData).sort((a, b) => a.Bin_ID.localeCompare(b.Bin_ID)).map(bin => {
                     let dotColor = "#34d399";
                     if(bin.Fill_Level > 80 || bin.Methane_PPM > 350) dotColor = "#f87171";
                     else if(bin.Fill_Level > 50) dotColor = "#fbbf24";
