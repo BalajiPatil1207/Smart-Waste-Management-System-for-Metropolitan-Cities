@@ -74,7 +74,7 @@ export default function DispatchReport({ dispatchLogs }) {
               <tbody>
                 {currentLogs.map((log, index) => (
                   <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s' }}>
-                    <td style={{ padding: '1rem', color: '#cbd5e1' }}>{dispatchLogs.length - (startIndex + index)}</td>
+                    <td style={{ padding: '1rem', color: '#cbd5e1' }}>{startIndex + index + 1}</td>
                     <td style={{ padding: '1rem', fontWeight: 'bold', color: '#f8fafc' }}>{log.binId}</td>
                     <td style={{ padding: '1rem', color: '#38bdf8' }}>{log.truckNo}</td>
                     <td style={{ padding: '1rem', color: '#cbd5e1' }}>{log.date}</td>
