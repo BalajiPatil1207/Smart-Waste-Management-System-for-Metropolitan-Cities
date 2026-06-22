@@ -1,10 +1,11 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { AlertTriangle } from 'lucide-react';
 
 export default function ConfirmModal({ isOpen, onClose, onConfirm }) {
     if (!isOpen) return null;
 
-    return (
+    return ReactDOM.createPortal(
         <div className="modal-overlay">
             <div className="modal-content glass-panel">
                 <AlertTriangle size={48} color="#f87171" style={{ marginBottom: '1rem' }} />
@@ -16,6 +17,7 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm }) {
                     <button className="btn-confirm" onClick={() => { onConfirm(); onClose(); }}>Yes, Logout</button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
