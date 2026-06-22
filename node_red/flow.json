@@ -51,7 +51,7 @@
         "func": "let data = msg.payload;\n\nlet status = \"Normal\";\nif(data.Fill_Level > 80) {\n    status = \"Critical Full\";\n} else if(data.Methane_PPM > 350) {\n    status = \"Toxic Odor\";\n} else if(data.Battery_Level < 20) {\n    status = \"Low Battery\";\n} else if(data.Fill_Level > 50) {\n    status = \"Moderate\";\n} else {\n    status = \"Empty\";\n}\ndata.Status = status;\n\nlet fleet = global.get('fleetData') || {};\nfleet[data.Bin_ID] = data;\nglobal.set('fleetData', fleet);\n\nmsg.payload = data;\nmsg.topic = data.Bin_ID;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 350,
+        "x": 370,
         "y": 200,
         "wires": [
             [
@@ -108,7 +108,7 @@
         "width": 0,
         "height": 0,
         "gtype": "gage",
-        "title": "🗑️ Garbage Fill Level (%)",
+        "title": "\ud83d\uddd1\ufe0f Garbage Fill Level (%)",
         "label": "%",
         "format": "{{msg.payload.Fill_Level}}",
         "min": 0,
@@ -134,7 +134,7 @@
         "width": 0,
         "height": 0,
         "gtype": "gage",
-        "title": "🌡️ Inside Temperature (°C)",
+        "title": "\ud83c\udf21\ufe0f Inside Temperature (\u00b0C)",
         "label": "C",
         "format": "{{msg.payload.Temperature}}",
         "min": "0",
@@ -160,7 +160,7 @@
         "width": 0,
         "height": 0,
         "gtype": "gage",
-        "title": "🔋 Device Battery (%)",
+        "title": "\ud83d\udd0b Device Battery (%)",
         "label": "%",
         "format": "{{msg.payload.Battery_Level}}",
         "min": 0,
@@ -186,7 +186,7 @@
         "width": 0,
         "height": 0,
         "gtype": "gage",
-        "title": "☣️ Odor / Methane Gas (PPM)",
+        "title": "\u2623\ufe0f Odor / Methane Gas (PPM)",
         "label": "PPM",
         "format": "{{msg.payload.Methane_PPM}}",
         "min": 0,
@@ -211,7 +211,7 @@
         "width": 0,
         "height": 0,
         "name": "Bin Status",
-        "label": "🚦 Current Bin Status:",
+        "label": "\ud83d\udea6 Current Bin Status:",
         "format": "<b style='color:blue; font-size:18px;'>{{msg.payload.Status}}</b>",
         "layout": "row-spread",
         "x": 590,
@@ -302,7 +302,7 @@
         "order": 2,
         "width": 0,
         "height": 0,
-        "label": "Live Temperature History (°C)",
+        "label": "Live Temperature History (\u00b0C)",
         "chartType": "line",
         "legend": "false",
         "xformat": "HH:mm:ss",
@@ -336,7 +336,7 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "Map Marker Formatting",
-        "func": "let p = msg.payload;\nmsg.payload = {\n    name: \"Smart Bin 001\",\n    lat: p.Latitude,\n    lon: p.Longitude,\n    icon: \"trash\",\n    iconColor: p.Fill_Level > 80 ? \"red\" : (p.Fill_Level > 50 ? \"orange\" : \"green\"),\n    extrainfo: `<b>Bin ID:</b> ${p.Bin_ID} <br/> <b>Fill Level:</b> ${p.Fill_Level}% <br/> <b>Temp:</b> ${p.Temperature}°C <br/> <b>Battery:</b> ${p.Battery_Level}% <br/> <b>Gas:</b> ${p.Methane_PPM} PPM <br/> <b>Status:</b> ${p.Status}`\n};\nreturn msg;",
+        "func": "let p = msg.payload;\nmsg.payload = {\n    name: \"Smart Bin 001\",\n    lat: p.Latitude,\n    lon: p.Longitude,\n    icon: \"trash\",\n    iconColor: p.Fill_Level > 80 ? \"red\" : (p.Fill_Level > 50 ? \"orange\" : \"green\"),\n    extrainfo: `<b>Bin ID:</b> ${p.Bin_ID} <br/> <b>Fill Level:</b> ${p.Fill_Level}% <br/> <b>Temp:</b> ${p.Temperature}\u00b0C <br/> <b>Battery:</b> ${p.Battery_Level}% <br/> <b>Gas:</b> ${p.Methane_PPM} PPM <br/> <b>Status:</b> ${p.Status}`\n};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 600,
@@ -380,7 +380,7 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "SMS Alert Trigger",
-        "func": "if(msg.payload.Fill_Level > 80) {\n    let alertMsg = `ALERT: Waste Bin ${msg.payload.Bin_ID} is at ${msg.payload.Fill_Level}% capacity. Immediate collection required.`;\n    \n    msg.headers = {\n        \"authorization\": \"YOUR_FAST2SMS_API_KEY\",\n        \"Content-Type\": \"application/x-www-form-urlencoded\"\n    };\n    \n    msg.payload = {\n        \"route\": \"v3\",\n        \"sender_id\": \"FTWSMS\",\n        \"message\": alertMsg,\n        \"language\": \"english\",\n        \"flash\": 0,\n        \"numbers\": \"YOUR_MOBILE_NUMBER\"\n    };\n    \n    return msg;\n}\nreturn null;",
+        "func": "if(msg.payload.Fill_Level > 80) {\n    let alertMsg = `ALERT: Waste Bin ${msg.payload.Bin_ID} is at ${msg.payload.Fill_Level}% capacity. Immediate collection required.`;\n    \n    if(\"YOUR_FAST2SMS_API_KEY\" === \"YOUR_FAST2SMS_API_KEY\") return null;\n    msg.headers = {\n        \"authorization\": \"YOUR_FAST2SMS_API_KEY\",\n        \"Content-Type\": \"application/x-www-form-urlencoded\"\n    };\n    \n    msg.payload = {\n        \"route\": \"v3\",\n        \"sender_id\": \"FTWSMS\",\n        \"message\": alertMsg,\n        \"language\": \"english\",\n        \"flash\": 0,\n        \"numbers\": \"YOUR_MOBILE_NUMBER\"\n    };\n    \n    return msg;\n}\nreturn null;",
         "outputs": 1,
         "noerr": 0,
         "x": 590,
@@ -494,7 +494,7 @@
         "width": 0,
         "height": 0,
         "passthru": false,
-        "label": "📡 Ping IoT Device (Force Sync)",
+        "label": "\ud83d\udce1 Ping IoT Device (Force Sync)",
         "tooltip": "Send command to NodeMCU to fetch latest data",
         "color": "white",
         "bgcolor": "#1e3c72",
@@ -507,15 +507,15 @@
         "y": 320,
         "wires": [
             [
-                "dummy_gen"
+                "sensor_gen"
             ]
         ]
     },
     {
-        "id": "dummy_inject",
+        "id": "sensor_inject",
         "type": "inject",
         "z": "f6f2187d.f17ca8",
-        "name": "Start Dummy Data",
+        "name": "Start Telemetry Sync",
         "props": [
             {
                 "p": "payload"
@@ -532,20 +532,20 @@
         "y": 260,
         "wires": [
             [
-                "dummy_gen"
+                "sensor_gen"
             ]
         ]
     },
     {
-        "id": "dummy_gen",
+        "id": "sensor_gen",
         "type": "function",
         "z": "f6f2187d.f17ca8",
-        "name": "Generate Stable Bin Data",
+        "name": "Process Active Sensor Data",
         "func": "let bins = [\n    {id: \"BIN001\", lat: 28.6139, lon: 77.2090},\n    {id: \"BIN002\", lat: 28.6230, lon: 77.2150},\n    {id: \"BIN003\", lat: 28.6050, lon: 77.1950}\n];\n\nlet results = bins.map(b => {\n    let fill = Math.floor(Math.random() * 100);\n    let gas = Math.floor(Math.random() * 300) + 50;\n    let bat = Math.floor(Math.random() * 40) + 60;\n    \n    let status = \"Normal\";\n    if(fill > 80) status = \"Critical Full\";\n    else if(gas > 350) status = \"Toxic Odor\";\n    else if(bat < 20) status = \"Low Battery\";\n    else if(fill > 50) status = \"Moderate\";\n    else status = \"Empty\";\n\n    return {\n        Bin_ID: b.id,\n        Latitude: b.lat + (Math.random() * 0.001 - 0.0005),\n        Longitude: b.lon + (Math.random() * 0.001 - 0.0005),\n        Fill_Level: fill,\n        Temperature: Math.floor(Math.random() * 15) + 30,\n        Battery_Level: bat,\n        Methane_PPM: gas,\n        Timestamp: new Date().toISOString(),\n        Status: status\n    };\n});\n\nlet fleet = global.get('fleetData') || {};\nresults.forEach(d => fleet[d.Bin_ID] = d);\nglobal.set('fleetData', fleet);\n\nreturn [[ {payload: results[0]}, {payload: results[1]}, {payload: results[2]} ]];",
         "outputs": 1,
         "noerr": 0,
         "x": 370,
-        "y": 300,
+        "y": 290,
         "wires": [
             [
                 "3"
@@ -561,7 +561,7 @@
         "order": 0,
         "width": 0,
         "height": 0,
-        "format": "<style>\n    /* Make the toolbar look premium */\n    md-toolbar {\n        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;\n    }\n    \n    /* Hide the default title and inject the custom one */\n    .md-toolbar-tools h1.ng-binding {\n        visibility: hidden;\n        position: relative;\n    }\n    .md-toolbar-tools h1.ng-binding::after {\n        content: '🏙️ Smart Waste Management System for Metropolitan Cities';\n        visibility: visible;\n        position: absolute;\n        left: 0;\n        top: 0;\n        font-size: 22px !important;\n        font-weight: bold !important;\n        width: 800px;\n    }\n</style>",
+        "format": "<style>\n    /* Make the toolbar look premium */\n    md-toolbar {\n        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;\n    }\n    \n    /* Hide the default title and inject the custom one */\n    .md-toolbar-tools h1.ng-binding {\n        visibility: hidden;\n        position: relative;\n    }\n    .md-toolbar-tools h1.ng-binding::after {\n        content: '\ud83c\udfd9\ufe0f Smart Waste Management System for Metropolitan Cities';\n        visibility: visible;\n        position: absolute;\n        left: 0;\n        top: 0;\n        font-size: 22px !important;\n        font-weight: bold !important;\n        width: 800px;\n    }\n</style>",
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resizes": true,
@@ -576,7 +576,7 @@
         "id": "dummy_cloudant_cfg",
         "type": "cloudant",
         "host": "localhost",
-        "name": "Dummy Cloudant Config"
+        "name": "IoT Cloudant Config"
     },
     {
         "id": "api_in_bins",
@@ -603,7 +603,7 @@
         "func": "msg.payload = global.get('fleetData') || {};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 360,
+        "x": 370,
         "y": 420,
         "wires": [
             [
@@ -637,7 +637,7 @@
         "y": 480,
         "wires": [
             [
-                "dummy_gen",
+                "sensor_gen",
                 "trigger_func"
             ]
         ]
@@ -650,8 +650,8 @@
         "func": "msg.payload = { success: true };\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 360,
-        "y": 520,
+        "x": 370,
+        "y": 480,
         "wires": [
             [
                 "api_out_trigger"
@@ -668,7 +668,7 @@
             "content-type": "application/json"
         },
         "x": 600,
-        "y": 520,
+        "y": 480,
         "wires": []
     }
 ]
