@@ -11,8 +11,8 @@ export default function DashboardHeader({ handlePingDevice, statusClass, getStat
 
         const interval = setInterval(() => {
             const timeDiff = Date.now() - new Date(activeBin.Timestamp).getTime();
-            // If data is older than 15 seconds, assume hardware is disconnected
-            setIsHardwareOnline(timeDiff <= 15000);
+            // If data is older than 25 seconds, assume hardware is disconnected
+            setIsHardwareOnline(timeDiff <= 25000);
         }, 1000);
 
         return () => clearInterval(interval);
