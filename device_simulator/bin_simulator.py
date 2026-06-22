@@ -13,7 +13,7 @@ def main():
     print("======================================================")
     
     print("[SUCCESS] Connected to Local Node-RED Backend!")
-    print(f"Publishing data every 5 seconds to {NODE_RED_URL}")
+    print(f"Publishing data every 10 seconds to {NODE_RED_URL}")
     print("Press Ctrl+C to stop.\n")
     
     try:
@@ -30,7 +30,7 @@ def main():
             except requests.exceptions.ConnectionError:
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] [ERROR] Connection failed. Is Node-RED running on port 1880?")
             
-            time.sleep(5)
+            time.sleep(10)
             
     except KeyboardInterrupt:
         print("\n[INFO] Simulation stopped by user.")
