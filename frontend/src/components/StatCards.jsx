@@ -25,44 +25,70 @@ export default function StatCards({ activeBin }) {
   return (
     <div className="grid-top">
       <div className="glass-panel stat-card" style={activeBin.Fill_Level > 80 ? { border: '1px solid rgba(248, 113, 113, 0.5)', boxShadow: '0 0 15px rgba(248, 113, 113, 0.15)' } : {}}>
-        <div className="stat-header"><span>Garbage Level</span><Trash2 size={24} color={activeBin.Fill_Level > 80 ? "#f87171" : "#38bdf8"} /></div>
-        <div className="stat-value" style={{ color: activeBin.Fill_Level > 80 ? '#f87171' : '#f8fafc' }}>
-          {activeBin.Fill_Level}<span className="stat-unit">%</span>
-        </div>
-        <div className="stat-sub" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <span>Predicted Full: {activeBin.Fill_Level > 80 ? 'Immediately' : (100 - activeBin.Fill_Level) + ' hrs'}</span>
-          
-          {/* Dispatch Truck Button for Critical Bins */}
-          {activeBin.Fill_Level > 80 && (
-            <button 
-              onClick={handleDispatch}
-              disabled={isDispatching || dispatched}
-              style={{
-                background: dispatched ? 'rgba(52, 211, 153, 0.1)' : 'rgba(248, 113, 113, 0.1)',
-                border: `1px solid ${dispatched ? '#34d399' : '#f87171'}`,
-                color: dispatched ? '#34d399' : '#f87171',
-                padding: '0.5rem',
-                borderRadius: '8px',
-                cursor: (isDispatching || dispatched) ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                marginTop: '0.5rem',
-                transition: 'all 0.3s ease',
-                fontWeight: '600',
-                fontSize: '0.85rem'
-              }}
-            >
-              {isDispatching ? (
-                <>⏳ Dispatching Truck...</>
-              ) : dispatched ? (
-                <><CheckCircle size={16} /> Truck MH-12-SW-101 Dispatched!</>
-              ) : (
-                <><Truck size={16} /> Dispatch Collection Truck</>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '15px' }}>
+          {/* Left: Text Stats */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div className="stat-header"><span>Garbage Level</span><Trash2 size={24} color={activeBin.Fill_Level > 80 ? "#f87171" : "#38bdf8"} /></div>
+            <div className="stat-value" style={{ color: activeBin.Fill_Level > 80 ? '#f87171' : '#f8fafc' }}>
+              {activeBin.Fill_Level}<span className="stat-unit">%</span>
+            </div>
+            <div className="stat-sub" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: 'auto' }}>
+              <span>Predicted Full: {activeBin.Fill_Level > 80 ? 'Immediately' : (100 - activeBin.Fill_Level) + ' hrs'}</span>
+              
+              {/* Dispatch Truck Button for Critical Bins */}
+              {activeBin.Fill_Level > 80 && (
+                <button 
+                  onClick={handleDispatch}
+                  disabled={isDispatching || dispatched}
+                  style={{
+                    background: dispatched ? 'rgba(52, 211, 153, 0.1)' : 'rgba(248, 113, 113, 0.1)',
+                    border: `1px solid ${dispatched ? '#34d399' : '#f87171'}`,
+                    color: dispatched ? '#34d399' : '#f87171',
+                    padding: '0.5rem',
+                    borderRadius: '8px',
+                    cursor: (isDispatching || dispatched) ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    marginTop: '0.5rem',
+                    transition: 'all 0.3s ease',
+                    fontWeight: '600',
+                    fontSize: '0.85rem'
+                  }}
+                >
+                  {isDispatching ? (
+                    <>⏳ Dispatching...</>
+                  ) : dispatched ? (
+                    <><CheckCircle size={16} /> Dispatched!</>
+                  ) : (
+                    <><Truck size={16} /> Dispatch Truck</>
+                  )}
+                </button>
               )}
-            </button>
-          )}
+            </div>
+          </div>
+
+          {/* Right: CSS 3D Volumetric Cylinder */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingRight: '5px' }}>
+            <div className="bin-3d-container">
+              <div className="glass-cylinder">
+                <div className="cylinder-top"></div>
+                <div className="cylinder-wall"></div>
+                <div className="cylinder-bottom"></div>
+                
+                {/* Visual trash level fill */}
+                <div 
+                  className={`fill-cylinder ${activeBin.Fill_Level > 80 ? 'fill-red flashing-alarm' : activeBin.Fill_Level > 50 ? 'fill-yellow' : 'fill-green'}`} 
+                  style={{ height: `${Math.max(14, activeBin.Fill_Level)}%`, width: '100%' }}
+                >
+                  <div className="fill-top"></div>
+                  <div className="fill-wall"></div>
+                  <div className="fill-bottom"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
