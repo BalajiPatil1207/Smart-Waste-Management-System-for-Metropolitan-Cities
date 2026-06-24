@@ -1,3 +1,4 @@
+node_modules/
 docs/demo_video/
 *.mp4
 *.mkv
