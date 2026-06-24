@@ -179,6 +179,82 @@ export default function App() {
     try { await fetch('/api/trigger'); } catch (err) {}
   };
 
+  const handleLidToggle = async (binId, nextLidStatus) => {
+    const bin = fleetData[binId];
+    if (!bin) return;
+    
+    const updatedBin = {
+      ...bin,
+      Lid_Status: nextLidStatus,
+      Timestamp: new Date().toISOString()
+    };
+    
+    // Update local state immediately for snappy UI
+    setFleetData(prev => ({
+      ...prev,
+      [binId]: updatedBin
+    }));
+    
+    try {
+      const response = await fetch('/api/telemetry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          Bin_ID: binId,
+          Fill_Level: bin.Fill_Level,
+          Methane_PPM: bin.Methane_PPM,
+          Temperature: bin.Temperature,
+          Battery_Level: bin.Battery_Level,
+          Humidity: bin.Humidity,
+          Lid_Status: nextLidStatus,
+          Solar_Charge: bin.Solar_Charge
+        })
+      });
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setFleetData(prev => ({
+            ...prev,
+            [binId]: result.data
+          }));
+        }
+      }
+    } catch (err) {
+      console.error("Failed to sync lid toggle", err);
+    }
+  };
+
+  const calculatePrediction = (historyList) => {
+    if (!historyList || historyList.length < 3) return "Analyzing rate...";
+    
+    const points = [...historyList].slice(-6); // last 6 points
+    let deltas = [];
+    for (let i = 1; i < points.length; i++) {
+      deltas.push(points[i].level - points[i - 1].level);
+    }
+    
+    const avgDelta = deltas.reduce((a, b) => a + b, 0) / deltas.length;
+    
+    if (avgDelta <= 0) {
+      return "Steady Capacity";
+    }
+    
+    const currentLevel = points[points.length - 1].level;
+    const remainingLevel = 95 - currentLevel;
+    if (remainingLevel <= 0) {
+      return "Overflowing!";
+    }
+    
+    const secondsRemaining = (remainingLevel / avgDelta) * 10;
+    const minutesRemaining = Math.ceil(secondsRemaining / 60);
+    
+    if (minutesRemaining > 120) {
+      return `Steady (~${Math.round(minutesRemaining / 60)} hrs)`;
+    }
+    return `${minutesRemaining} min left`;
+  };
+
+
   const handleDownloadPdf = async () => {
     const element = chartRef.current;
     const activeBin = fleetData[activeBinId];
@@ -306,6 +382,8 @@ export default function App() {
           statusClass={statusClass}
           getStatusMeaning={getStatusMeaning}
           activeBin={activeBin}
+          handleLidToggle={handleLidToggle}
+          projection={calculatePrediction(activeHistory)}
         />
 
         {currentView === 'reports' ? (
