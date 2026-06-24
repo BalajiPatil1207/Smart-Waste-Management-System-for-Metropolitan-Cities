@@ -23,6 +23,7 @@ export default function HardwareSimulator({
     const [connectionStatus, setConnectionStatus] = useState('checking'); // 'checking', 'online', 'offline'
     const [syncing, setSyncing] = useState(false);
     const [logs, setLogs] = useState([]);
+    const [isMuted, setIsMuted] = useState(false);
 
     const syncTimeoutRef = useRef(null);
     const pirTimeoutRef = useRef(null);
@@ -109,6 +110,49 @@ export default function HardwareSimulator({
             addLog(`[BUZZER ALARM] GPIO25 HIGH: ${alarmType} alert active! Beeping Piezo...`);
         }
     }, [buzzerActive, fillLevel, gasPpm]);
+
+    // Audio oscillator beep loop
+    useEffect(() => {
+        if (!buzzerActive || isMuted) return;
+
+        let audioCtx;
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.error("Web Audio API not supported", e);
+            return;
+        }
+
+        const playBeep = () => {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(2400, audioCtx.currentTime); // 2.4kHz typical piezo buzzer frequency
+            
+            gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.12);
+        };
+
+        playBeep();
+        const interval = setInterval(playBeep, 1500);
+
+        return () => {
+            clearInterval(interval);
+            if (audioCtx) {
+                audioCtx.close();
+            }
+        };
+    }, [buzzerActive, isMuted]);
 
     const addLog = (message) => {
         const time = new Date().toLocaleTimeString('en-US', { hour12: false });
@@ -466,6 +510,33 @@ export default function HardwareSimulator({
                                 </div>
                                 <span className="buzzer-label">Buzzer</span>
                             </div>
+
+                            {/* Audio Speaker Mute/Unmute Toggle */}
+                            <button 
+                                onClick={() => setIsMuted(prev => !prev)}
+                                style={{
+                                    position: 'absolute',
+                                    left: '370px',
+                                    top: '370px',
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    border: '1px solid rgba(56, 189, 248, 0.4)',
+                                    background: isMuted ? 'rgba(30, 41, 59, 0.8)' : 'rgba(56, 189, 248, 0.2)',
+                                    color: isMuted ? '#94a3b8' : '#38bdf8',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '1rem',
+                                    zIndex: 100,
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+                                    transition: 'all 0.2s',
+                                }}
+                                title={isMuted ? "Unmute Alarm Sound" : "Mute Alarm Sound"}
+                            >
+                                {isMuted ? '🔇' : '🔊'}
+                            </button>
 
                             {/* [Component 11] SG90 Servo Motor (Lid Action) */}
                             <div className="hw-servo-module" style={{ position: 'absolute', left: '460px', top: '375px', width: '120px', height: '80px' }}>
