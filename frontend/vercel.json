@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://your-node-red-backend.onrender.com/api/:path*"
+      "destination": "https://smart-waste-management-system-for.onrender.com/api/:path*"
     }
   ]
 }
