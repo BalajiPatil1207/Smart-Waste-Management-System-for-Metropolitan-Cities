@@ -415,6 +415,60 @@ export default function LandingScreen({ onStart }) {
           </div>
         </div>
 
+        {/* System Showcase Image Section */}
+        <div 
+          className={`landing-showcase-section ${loaded ? 'fade-in-up' : ''}`}
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            width: '100%',
+            maxWidth: '1200px',
+            margin: '3rem auto 0',
+            padding: '0 1rem',
+            textAlign: 'center'
+          }}
+        >
+          <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f8fafc', marginBottom: '0.5rem' }}>
+            System Architecture Preview
+          </h3>
+          <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginBottom: '1.5rem', maxWidth: '600px', margin: '0 auto 1.5rem' }}>
+            Real-time sensory tracking, automated municipal dispatching, and live Cloudant integration combined in a seamless control panel.
+          </p>
+          <div 
+            style={{
+              background: 'rgba(15, 23, 42, 0.6)',
+              border: '1.5px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '16px',
+              padding: '8px',
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+              display: 'inline-block',
+              maxWidth: '100%',
+              transition: 'transform 0.3s ease, border-color 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.01)';
+              e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+            }}
+          >
+            <img 
+              src="/project_showcase.png" 
+              alt="EcoSmart Metropolis System Interface" 
+              style={{
+                width: '100%',
+                maxWidth: '900px',
+                height: 'auto',
+                borderRadius: '12px',
+                display: 'block'
+              }}
+            />
+          </div>
+        </div>
+
         {/* Footer */}
         <footer style={{ 
           marginTop: '3rem', 
