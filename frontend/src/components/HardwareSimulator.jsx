@@ -24,6 +24,7 @@ export default function HardwareSimulator({
     const [syncing, setSyncing] = useState(false);
     const [logs, setLogs] = useState([]);
     const [isMuted, setIsMuted] = useState(false);
+    const [isFullScreen, setIsFullScreen] = useState(false);
 
     const syncTimeoutRef = useRef(null);
     const pirTimeoutRef = useRef(null);
@@ -299,12 +300,34 @@ export default function HardwareSimulator({
             <div className="simulator-grid">
                 
                 {/* Visual PCB Canvas */}
-                <div className="glass-panel pcb-card">
+                <div className={`glass-panel pcb-card ${isFullScreen ? 'fullscreen' : ''}`}>
                     <div className="pcb-title-bar">
                         <h3>Advanced ESP32 Smart Bin PCB Workbench</h3>
-                        <span className="bin-tag" style={{ background: 'rgba(167, 139, 250, 0.15)', borderColor: '#a78bfa', color: '#a78bfa' }}>
-                            {selectedBin} Telemetry Node
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span className="bin-tag" style={{ background: 'rgba(167, 139, 250, 0.15)', borderColor: '#a78bfa', color: '#a78bfa' }}>
+                                {selectedBin} Telemetry Node
+                            </span>
+                            <button 
+                                onClick={() => setIsFullScreen(prev => !prev)}
+                                style={{
+                                    padding: '0.4rem 0.8rem',
+                                    background: 'rgba(56, 189, 248, 0.1)',
+                                    border: '1px solid #38bdf8',
+                                    borderRadius: '6px',
+                                    color: '#38bdf8',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 'bold',
+                                    transition: 'all 0.2s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                {isFullScreen ? '🗗 Minimize' : '🗖 Maximize'}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="pcb-container" style={{ padding: '1.5rem 0.5rem' }}>
