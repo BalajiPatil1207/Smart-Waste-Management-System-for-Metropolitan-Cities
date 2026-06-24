@@ -521,7 +521,7 @@
                 "p": "payload"
             }
         ],
-        "repeat": "",
+        "repeat": "10",
         "crontab": "",
         "once": true,
         "onceDelay": 0.1,
