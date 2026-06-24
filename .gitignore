@@ -2,3 +2,9 @@ docs/demo_video/
 *.mp4
 *.mkv
 *.avi
+
+# Node-RED temporary/config files
+.config.json
+.sessions.json
+flows_cred.json
+*.backup

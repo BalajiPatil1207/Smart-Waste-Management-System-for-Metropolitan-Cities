@@ -1,0 +1,14 @@
+{
+  "name": "smart-waste-management-backend",
+  "version": "1.0.0",
+  "description": "Backend Node-RED server for Smart Waste Management System",
+  "main": "index.js",
+  "scripts": {
+    "start": "node-red --port $PORT --userDir . node_red/flow.json"
+  },
+  "dependencies": {
+    "node-red": "^3.1.9",
+    "node-red-dashboard": "^3.6.2",
+    "node-red-node-cf-cloudant": "^0.2.22"
+  }
+}
