@@ -9,6 +9,6 @@
   "dependencies": {
     "node-red": "^3.1.9",
     "node-red-dashboard": "^3.6.2",
-    "node-red-node-cf-cloudant": "^0.2.22"
+    "node-red-node-cf-cloudant": "^0.2.17"
   }
 }
