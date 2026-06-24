@@ -139,6 +139,7 @@ body {
 }
 
 .header {
+  background: #0f172a !important; /* Solid background to prevent text mixing on scroll */
   display: flex;
   align-items: center;
   justify-content: space-between;
