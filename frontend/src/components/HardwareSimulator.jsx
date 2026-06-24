@@ -610,6 +610,9 @@ export default function HardwareSimulator({
                                 <option value="BIN001">BIN001 (Metropolitan Depot Central)</option>
                                 <option value="BIN002">BIN002 (Metropolitan Tech Hub East)</option>
                                 <option value="BIN003">BIN003 (Metropolitan Residential South)</option>
+                                <option value="BIN004">BIN004 (Metropolitan Commercial West)</option>
+                                <option value="BIN005">BIN005 (Metropolitan Station East)</option>
+                                <option value="BIN006">BIN006 (Metropolitan University West)</option>
                             </select>
                         </div>
 

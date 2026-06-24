@@ -9,7 +9,10 @@ new_func = """let fleet = global.get('fleetData') || {};
 let bins = [
     {id: "BIN001", lat: 28.6139, lon: 77.2090},
     {id: "BIN002", lat: 28.6230, lon: 77.2150},
-    {id: "BIN003", lat: 28.6050, lon: 77.1950}
+    {id: "BIN003", lat: 28.6050, lon: 77.1950},
+    {id: "BIN004", lat: 28.6180, lon: 77.2010},
+    {id: "BIN005", lat: 28.6090, lon: 77.2180},
+    {id: "BIN006", lat: 28.6280, lon: 77.1980}
 ];
 
 let results = bins.map(b => {
@@ -56,7 +59,7 @@ let results = bins.map(b => {
 });
 
 global.set('fleetData', fleet);
-return [[ {payload: results[0]}, {payload: results[1]}, {payload: results[2]} ]];
+return [[ {payload: results[0]}, {payload: results[1]}, {payload: results[2]}, {payload: results[3]}, {payload: results[4]}, {payload: results[5]} ]];
 """
 
 for node in data:

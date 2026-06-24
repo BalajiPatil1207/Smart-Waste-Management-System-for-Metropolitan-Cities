@@ -42,8 +42,8 @@ export default function DashboardHeader({
                 {fleetData && setActiveBinId && (
                     <div style={{ 
                         display: 'flex', alignItems: 'center', gap: '8px', 
-                        padding: '0.4rem 0.8rem', background: 'rgba(56, 189, 248, 0.1)', 
-                        border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px' 
+                        padding: '0.4rem 0.8rem', background: '#1e293b', 
+                        border: '1px solid #38bdf8', borderRadius: '8px' 
                     }}>
                         <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#38bdf8' }}>Active Bin:</span>
                         <select 
@@ -56,7 +56,7 @@ export default function DashboardHeader({
                                 border: 'none',
                                 cursor: 'pointer',
                                 fontWeight: 'bold',
-                                background: 'rgba(15, 23, 42, 0.8)',
+                                background: '#0f172a',
                                 color: '#fff',
                                 outline: 'none',
                                 transition: 'all 0.2s'
