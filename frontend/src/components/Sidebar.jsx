@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Server, Route, LayoutDashboard, ClipboardList, Cpu } from 'lucide-react';
+import { Server, Route, LayoutDashboard, ClipboardList, Cpu, Gamepad2 } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
 
 export default function Sidebar({
@@ -62,6 +62,20 @@ export default function Sidebar({
                 }}
               >
                 <ClipboardList size={18} /> Dispatch Reports
+              </button>
+
+              <button 
+                id="tour-segregation"
+                onClick={() => setCurrentView('segregation')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px', padding: '0.8rem', borderRadius: '8px',
+                  background: currentView === 'segregation' ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+                  border: currentView === 'segregation' ? '1px solid #38bdf8' : '1px solid transparent',
+                  color: currentView === 'segregation' ? '#38bdf8' : '#94a3b8',
+                  cursor: 'pointer', transition: 'all 0.2s', fontWeight: '600'
+                }}
+              >
+                <Gamepad2 size={18} /> Waste Segregation
               </button>
             </div>
 
