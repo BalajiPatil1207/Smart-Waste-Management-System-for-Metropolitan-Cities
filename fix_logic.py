@@ -50,6 +50,9 @@ let results = bins.map(b => {
         Temperature: Math.floor(Math.random() * 15) + 30,
         Battery_Level: bat,
         Methane_PPM: gas,
+        Humidity: prev.Humidity !== undefined ? prev.Humidity : 55,
+        Lid_Status: prev.Lid_Status !== undefined ? prev.Lid_Status : "CLOSED",
+        Solar_Charge: prev.Solar_Charge !== undefined ? prev.Solar_Charge : 0,
         Timestamp: new Date().toISOString(),
         Status: status
     };
