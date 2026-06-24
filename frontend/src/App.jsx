@@ -478,6 +478,8 @@ export default function App() {
              isFullMap={isFullMap}
              setIsFullMap={setIsFullMap}
              setActiveBinId={setActiveBinId}
+             toggleRoute={toggleRoute}
+             isRouting={isRouting}
           />
         ) : (
           <>
@@ -502,6 +504,8 @@ export default function App() {
                  isFullMap={isFullMap}
                  setIsFullMap={setIsFullMap}
                  setActiveBinId={setActiveBinId}
+                 toggleRoute={toggleRoute}
+                 isRouting={isRouting}
               />
             </div>
           </>

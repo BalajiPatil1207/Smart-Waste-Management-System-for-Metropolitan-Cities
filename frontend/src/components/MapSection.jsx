@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Truck } from 'lucide-react';
 import L from 'leaflet';
 
 const DEPOT_LOCATION = [28.6100, 77.2000];
@@ -31,7 +31,9 @@ export default function MapSection({
     getStatusMeaning,
     isFullMap,
     setIsFullMap,
-    setActiveBinId
+    setActiveBinId,
+    toggleRoute,
+    isRouting
 }) {
     const [truckIndex, setTruckIndex] = useState(0);
 
@@ -49,35 +51,75 @@ export default function MapSection({
     }, [showRoute, routeCoords]);
     return (
         <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', height: isFullMap ? 'calc(100vh - 180px)' : 'auto' }}>
-            <div className="chart-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="chart-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <AlertTriangle size={20} color="#fbbf24" /> Live Map Tracking
                 </span>
-                <button 
-                  id="tour-fullmap"
-                  onClick={() => setIsFullMap(!isFullMap)} 
-                  style={{ 
-                    padding: '6px 12px', 
-                    background: 'rgba(56, 189, 248, 0.1)', 
-                    border: '1px solid #38bdf8', 
-                    borderRadius: '6px', 
-                    color: '#38bdf8', 
-                    fontWeight: '600', 
-                    cursor: 'pointer',
-                    fontSize: '0.85rem',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseOver={(e) => {
-                    e.target.style.background = '#38bdf8';
-                    e.target.style.color = '#0f172a';
-                  }}
-                  onMouseOut={(e) => {
-                    e.target.style.background = 'rgba(56, 189, 248, 0.1)';
-                    e.target.style.color = '#38bdf8';
-                  }}
-                >
-                  {isFullMap ? 'Back to Dashboard' : 'View Full Map'}
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {toggleRoute && (
+                        <button 
+                          id="tour-route"
+                          onClick={toggleRoute} 
+                          disabled={isRouting}
+                          style={{ 
+                            padding: '6px 12px', 
+                            background: showRoute ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)', 
+                            border: showRoute ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)', 
+                            borderRadius: '6px', 
+                            color: showRoute ? '#38bdf8' : '#94a3b8', 
+                            fontWeight: '600', 
+                            cursor: isRouting ? 'not-allowed' : 'pointer',
+                            fontSize: '0.85rem',
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                          onMouseOver={(e) => {
+                            if (!showRoute && !isRouting) {
+                                e.currentTarget.style.background = 'rgba(56, 189, 248, 0.1)';
+                                e.currentTarget.style.borderColor = '#38bdf8';
+                                e.currentTarget.style.color = '#38bdf8';
+                            }
+                          }}
+                          onMouseOut={(e) => {
+                            if (!showRoute && !isRouting) {
+                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                                e.currentTarget.style.color = '#94a3b8';
+                            }
+                          }}
+                        >
+                          <Truck size={14} />
+                          {isRouting ? 'Routing...' : showRoute ? 'Hide Route' : 'Optimize Route'}
+                        </button>
+                    )}
+                    <button 
+                      id="tour-fullmap"
+                      onClick={() => setIsFullMap(!isFullMap)} 
+                      style={{ 
+                        padding: '6px 12px', 
+                        background: 'rgba(56, 189, 248, 0.1)', 
+                        border: '1px solid #38bdf8', 
+                        borderRadius: '6px', 
+                        color: '#38bdf8', 
+                        fontWeight: '600', 
+                        cursor: 'pointer',
+                        fontSize: '0.85rem',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = '#38bdf8';
+                        e.target.style.color = '#0f172a';
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = 'rgba(56, 189, 248, 0.1)';
+                        e.target.style.color = '#38bdf8';
+                      }}
+                    >
+                      {isFullMap ? 'Back to Dashboard' : 'View Full Map'}
+                    </button>
+                </div>
             </div>
             <div className="map-wrapper" style={{ flexGrow: 1, borderRadius: '12px', overflow: 'hidden', minHeight: '300px' }}>
                 <MapContainer center={[activeBin.Latitude, activeBin.Longitude]} zoom={14} style={{ height: '100%', width: '100%' }}>
