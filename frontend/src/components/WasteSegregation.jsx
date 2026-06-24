@@ -237,8 +237,8 @@ export default function WasteSegregation() {
                     }}
                   >
                     <span style={{ fontSize: '2rem' }}>{bin.emoji}</span>
-                    <span style={{ fontSize: '0.95rem' }}>{bin.marathi}</span>
-                    <span style={{ fontSize: '0.65rem', opacity: 0.6 }}>{bin.name}</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{bin.name}</span>
+                    <span style={{ fontSize: '0.75rem', opacity: 0.75 }}>{bin.marathi}</span>
                   </button>
                 ))}
               </div>
