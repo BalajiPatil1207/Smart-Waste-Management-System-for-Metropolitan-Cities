@@ -16,6 +16,7 @@ import StatCards from './components/StatCards';
 import ChartSection from './components/ChartSection';
 import MapSection from './components/MapSection';
 import DispatchReport from './components/DispatchReport';
+import HardwareSimulator from './components/HardwareSimulator';
 
 // Fix for default Leaflet marker icons in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -309,6 +310,14 @@ export default function App() {
 
         {currentView === 'reports' ? (
           <DispatchReport dispatchLogs={dispatchLogs} />
+        ) : currentView === 'simulator' ? (
+          <HardwareSimulator 
+             fleetData={fleetData}
+             activeBinId={activeBinId}
+             setActiveBinId={setActiveBinId}
+             setFleetData={setFleetData}
+             getStatusMeaning={getStatusMeaning}
+          />
         ) : isFullMap ? (
           <MapSection 
              activeBin={activeBin}
