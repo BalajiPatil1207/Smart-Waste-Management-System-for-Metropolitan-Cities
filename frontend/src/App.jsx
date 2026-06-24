@@ -17,6 +17,7 @@ import ChartSection from './components/ChartSection';
 import MapSection from './components/MapSection';
 import DispatchReport from './components/DispatchReport';
 import HardwareSimulator from './components/HardwareSimulator';
+import WasteSegregation from './components/WasteSegregation';
 
 // Fix for default Leaflet marker icons in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -396,6 +397,8 @@ export default function App() {
              setFleetData={setFleetData}
              getStatusMeaning={getStatusMeaning}
           />
+        ) : currentView === 'segregation' ? (
+          <WasteSegregation />
         ) : isFullMap ? (
           <MapSection 
              activeBin={activeBin}
