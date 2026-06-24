@@ -1854,3 +1854,132 @@ body {
   margin-top: 2px;
 }
 
+/* --- 3D Volumetric Cylinder Bin Styles --- */
+.bin-3d-container {
+  position: relative;
+  width: 70px;
+  height: 120px;
+  perspective: 600px;
+  margin-left: 10px;
+}
+
+.glass-cylinder {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(-12deg) rotateY(-10deg);
+  transition: all 0.5s ease;
+}
+
+.cylinder-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateZ(0px);
+  z-index: 5;
+}
+
+.cylinder-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15);
+  z-index: 1;
+}
+
+.cylinder-wall {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 100%;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-right: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.07) 100%);
+  border-radius: 4px;
+  z-index: 2;
+}
+
+/* Inner trash fill cylinder */
+.fill-cylinder {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  transform-style: preserve-3d;
+  transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 3;
+}
+
+.fill-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.8s ease;
+  z-index: 4;
+}
+
+.fill-wall {
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  left: 0;
+  width: 100%;
+  border-radius: 3px;
+  transition: background 0.8s ease;
+  z-index: 3;
+}
+
+.fill-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 14px;
+  border-radius: 50%;
+  transition: background-color 0.8s ease;
+  z-index: 2;
+}
+
+/* Color palettes */
+.fill-green .fill-top { background-color: #34d399; }
+.fill-green .fill-wall { background: linear-gradient(90deg, #10b981 0%, #34d399 50%, #10b981 100%); }
+.fill-green .fill-bottom { background-color: #10b981; }
+
+.fill-yellow .fill-top { background-color: #fbbf24; }
+.fill-yellow .fill-wall { background: linear-gradient(90deg, #d97706 0%, #fbbf24 50%, #d97706 100%); }
+.fill-yellow .fill-bottom { background-color: #d97706; }
+
+.fill-red .fill-top { background-color: #f87171; }
+.fill-red .fill-wall { background: linear-gradient(90deg, #dc2626 0%, #f87171 50%, #dc2626 100%); }
+.fill-red .fill-bottom { background-color: #dc2626; }
+
+/* Flashing critical alarm animation */
+.flashing-alarm {
+  animation: alarmGlow 1.2s infinite alternate;
+}
+
+@keyframes alarmGlow {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.4));
+    opacity: 0.8;
+  }
+  100% {
+    filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.85));
+    opacity: 1.0;
+  }
+}
