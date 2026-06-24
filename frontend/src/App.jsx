@@ -18,6 +18,7 @@ import MapSection from './components/MapSection';
 import DispatchReport from './components/DispatchReport';
 import HardwareSimulator from './components/HardwareSimulator';
 import WasteSegregation from './components/WasteSegregation';
+import BinSeparation from './components/BinSeparation';
 
 // Fix for default Leaflet marker icons in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -225,6 +226,67 @@ export default function App() {
     }
   };
 
+  const handleDispatchTruck = async (binId) => {
+    const bin = fleetData[binId];
+    if (!bin) return;
+
+    const updatedBin = {
+      ...bin,
+      Fill_Level: 0,
+      Methane_PPM: 50,
+      Status: "Empty",
+      Timestamp: new Date().toISOString()
+    };
+
+    setFleetData(prev => ({
+      ...prev,
+      [binId]: updatedBin
+    }));
+
+    setDispatchLogs(prev => {
+      const today = new Date().toLocaleDateString();
+      const newLog = {
+        id: Date.now() + Math.random(),
+        binId: binId,
+        truckNo: `MH-12-SW-${Math.floor(100 + Math.random() * 900)}`,
+        date: today,
+        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        timestamp: Date.now()
+      };
+      const updated = [newLog, ...prev];
+      localStorage.setItem("dispatchLogs", JSON.stringify(updated));
+      return updated;
+    });
+
+    try {
+      const response = await fetch('/api/telemetry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          Bin_ID: binId,
+          Fill_Level: 0,
+          Methane_PPM: 50,
+          Temperature: bin.Temperature,
+          Battery_Level: bin.Battery_Level,
+          Humidity: bin.Humidity,
+          Lid_Status: bin.Lid_Status,
+          Solar_Charge: bin.Solar_Charge
+        })
+      });
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setFleetData(prev => ({
+            ...prev,
+            [binId]: result.data
+          }));
+        }
+      }
+    } catch (err) {
+      console.error("Failed to sync dispatch telemetry", err);
+    }
+  };
+
   const calculatePrediction = (historyList) => {
     if (!historyList || historyList.length < 3) return "Analyzing rate...";
     
@@ -385,6 +447,8 @@ export default function App() {
           activeBin={activeBin}
           handleLidToggle={handleLidToggle}
           projection={calculatePrediction(activeHistory)}
+          fleetData={fleetData}
+          setActiveBinId={setActiveBinId}
         />
 
         {currentView === 'reports' ? (
@@ -399,6 +463,16 @@ export default function App() {
           />
         ) : currentView === 'segregation' ? (
           <WasteSegregation />
+        ) : currentView === 'separation' ? (
+          <BinSeparation 
+             fleetData={fleetData}
+             setActiveBinId={setActiveBinId}
+             setCurrentView={setCurrentView}
+             getStatusMeaning={getStatusMeaning}
+             onDispatchTruck={handleDispatchTruck}
+             toggleRoute={toggleRoute}
+             showRoute={showRoute}
+          />
         ) : isFullMap ? (
           <MapSection 
              activeBin={activeBin}
@@ -411,6 +485,7 @@ export default function App() {
              getStatusMeaning={getStatusMeaning}
              isFullMap={isFullMap}
              setIsFullMap={setIsFullMap}
+             setActiveBinId={setActiveBinId}
           />
         ) : (
           <>
@@ -434,6 +509,7 @@ export default function App() {
                  getStatusMeaning={getStatusMeaning}
                  isFullMap={isFullMap}
                  setIsFullMap={setIsFullMap}
+                 setActiveBinId={setActiveBinId}
               />
             </div>
           </>

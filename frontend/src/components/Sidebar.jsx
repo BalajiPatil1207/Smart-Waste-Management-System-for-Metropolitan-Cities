@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Server, Route, LayoutDashboard, ClipboardList, Cpu, Gamepad2 } from 'lucide-react';
+import { Server, Route, LayoutDashboard, ClipboardList, Cpu, Gamepad2, Layers } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
 
 export default function Sidebar({
@@ -65,6 +65,20 @@ export default function Sidebar({
               </button>
 
               <button 
+                id="tour-separation"
+                onClick={() => setCurrentView('separation')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px', padding: '0.8rem', borderRadius: '8px',
+                  background: currentView === 'separation' ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+                  border: currentView === 'separation' ? '1px solid #38bdf8' : '1px solid transparent',
+                  color: currentView === 'separation' ? '#38bdf8' : '#94a3b8',
+                  cursor: 'pointer', transition: 'all 0.2s', fontWeight: '600'
+                }}
+              >
+                <Layers size={18} /> Bin Separation
+              </button>
+
+              <button 
                 id="tour-segregation"
                 onClick={() => setCurrentView('segregation')}
                 style={{
@@ -77,47 +91,6 @@ export default function Sidebar({
               >
                 <Gamepad2 size={18} /> Waste Segregation
               </button>
-            </div>
-
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '1rem', lineHeight: '1.5' }}>
-                Select a Smart Bin to monitor real-time analytics and map location.
-            </p>
-
-            <button 
-                id="tour-route"
-                className={`route-btn ${showRoute ? 'active' : ''}`} 
-                onClick={toggleRoute}
-                disabled={isRouting}
-            >
-                <Route size={18}/> {isRouting ? 'Calculating Best Route...' : (showRoute ? 'Hide Route' : 'Optimize Truck Route')}
-            </button>
-            
-            {showRoute && binsNeedingPickup.length === 0 && (
-                <div style={{ color: '#34d399', fontSize: '0.85rem', marginBottom: '1rem' }}>No bins need immediate pickup!</div>
-            )}
-
-            <div className="bin-list" id="tour-bins">
-                {Object.values(fleetData).sort((a, b) => a.Bin_ID.localeCompare(b.Bin_ID)).map(bin => {
-                    let dotColor = "#34d399";
-                    if(bin.Fill_Level > 80 || bin.Methane_PPM > 350) dotColor = "#f87171";
-                    else if(bin.Fill_Level > 50) dotColor = "#fbbf24";
-                    
-                    return (
-                        <div key={bin.Bin_ID} className={`bin-item ${activeBinId === bin.Bin_ID ? 'active' : ''}`} onClick={() => setActiveBinId(bin.Bin_ID)}>
-                            <div className="bin-item-header">
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <div className="status-dot" style={{ backgroundColor: dotColor }}></div>
-                                    <strong>{bin.Bin_ID}</strong>
-                                </div>
-                                <span className="bin-item-level">{bin.Fill_Level}%</span>
-                            </div>
-                            <div className="bin-item-sub">
-                                <strong style={{ color: dotColor }}>{bin.Status}</strong> <br/>
-                                <span style={{ opacity: 0.8, fontSize: '0.75rem', marginTop: '3px', display: 'inline-block' }}>👉 {getStatusMeaning(bin.Status)}</span>
-                            </div>
-                        </div>
-                    );
-                })}
             </div>
             
             <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>

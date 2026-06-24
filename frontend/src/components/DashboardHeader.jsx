@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Wifi, WifiOff } from 'lucide-react';
 
-export default function DashboardHeader({ handlePingDevice, statusClass, getStatusMeaning, activeBin, handleLidToggle, projection }) {
+export default function DashboardHeader({ 
+    handlePingDevice, 
+    statusClass, 
+    getStatusMeaning, 
+    activeBin, 
+    handleLidToggle, 
+    projection,
+    fleetData,
+    setActiveBinId
+}) {
     const [isPinging, setIsPinging] = useState(false);
     const [isHardwareOnline, setIsHardwareOnline] = useState(true);
 
@@ -29,6 +38,39 @@ export default function DashboardHeader({ handlePingDevice, statusClass, getStat
             <h1><MapPin size={36} color="#38bdf8" /> Metropolitan Smart Waste System</h1>
             <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
                 
+                {/* Active Bin Select Dropdown */}
+                {fleetData && setActiveBinId && (
+                    <div style={{ 
+                        display: 'flex', alignItems: 'center', gap: '8px', 
+                        padding: '0.4rem 0.8rem', background: 'rgba(56, 189, 248, 0.1)', 
+                        border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px' 
+                    }}>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#38bdf8' }}>Active Bin:</span>
+                        <select 
+                            value={activeBin.Bin_ID}
+                            onChange={(e) => setActiveBinId(e.target.value)}
+                            style={{
+                                padding: '0.2rem 0.5rem',
+                                fontSize: '0.85rem',
+                                borderRadius: '6px',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                background: 'rgba(15, 23, 42, 0.8)',
+                                color: '#fff',
+                                outline: 'none',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            {Object.values(fleetData).sort((a,b)=>a.Bin_ID.localeCompare(b.Bin_ID)).map(bin => (
+                                <option key={bin.Bin_ID} value={bin.Bin_ID} style={{ background: '#0f172a' }}>
+                                    {bin.Bin_ID} ({bin.Fill_Level}%)
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
                 {/* Rate Projection Column */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'flex-end' }}>
                     <div className={`status-badge ${statusClass}`} title={getStatusMeaning(activeBin.Status)}>

@@ -30,7 +30,8 @@ export default function MapSection({
     orangeIcon, 
     getStatusMeaning,
     isFullMap,
-    setIsFullMap
+    setIsFullMap,
+    setActiveBinId
 }) {
     const [truckIndex, setTruckIndex] = useState(0);
 
@@ -98,6 +99,11 @@ export default function MapSection({
                                 key={bin.Bin_ID} 
                                 position={[bin.Latitude, bin.Longitude]}
                                 icon={markerIcon}
+                                eventHandlers={{
+                                    click: () => {
+                                        if (setActiveBinId) setActiveBinId(bin.Bin_ID);
+                                    }
+                                }}
                             >
                                 <Popup>
                                     <strong>{bin.Bin_ID}</strong><br/>
