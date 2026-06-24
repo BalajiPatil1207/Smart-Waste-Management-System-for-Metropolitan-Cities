@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Server, Route, LayoutDashboard, ClipboardList } from 'lucide-react';
+import { Server, Route, LayoutDashboard, ClipboardList, Cpu } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
 
 export default function Sidebar({
@@ -34,6 +34,20 @@ export default function Sidebar({
                 }}
               >
                 <LayoutDashboard size={18} /> Live Dashboard
+              </button>
+
+              <button 
+                id="tour-simulator"
+                onClick={() => setCurrentView('simulator')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px', padding: '0.8rem', borderRadius: '8px',
+                  background: currentView === 'simulator' ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+                  border: currentView === 'simulator' ? '1px solid #38bdf8' : '1px solid transparent',
+                  color: currentView === 'simulator' ? '#38bdf8' : '#94a3b8',
+                  cursor: 'pointer', transition: 'all 0.2s', fontWeight: '600'
+                }}
+              >
+                <Cpu size={18} /> Hardware Simulator
               </button>
 
               <button 
