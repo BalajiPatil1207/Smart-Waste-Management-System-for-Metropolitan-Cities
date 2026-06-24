@@ -3,8 +3,8 @@ import requests
 import random
 from datetime import datetime
 
-# Node-RED local API endpoint
-NODE_RED_URL = "http://127.0.0.1:1880/api/trigger"
+# Node-RED live API endpoint
+NODE_RED_URL = "https://smart-waste-management-system-for.onrender.com/api/trigger"
 
 def main():
     print("======================================================")
