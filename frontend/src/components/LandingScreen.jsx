@@ -460,7 +460,7 @@ export default function LandingScreen({ onStart }) {
               alt="EcoSmart Metropolis System Interface" 
               style={{
                 width: '100%',
-                maxWidth: '900px',
+                maxWidth: '650px',
                 height: 'auto',
                 borderRadius: '12px',
                 display: 'block'
