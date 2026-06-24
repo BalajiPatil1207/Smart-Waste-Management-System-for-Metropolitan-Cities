@@ -426,14 +426,6 @@ export default function App() {
   return (
     <div className="app-layout">
       <Sidebar 
-        fleetData={fleetData}
-        activeBinId={activeBinId}
-        setActiveBinId={setActiveBinId}
-        showRoute={showRoute}
-        toggleRoute={toggleRoute}
-        isRouting={isRouting}
-        binsNeedingPickup={binsNeedingPickup}
-        getStatusMeaning={getStatusMeaning}
         setIsLoggedIn={setIsLoggedIn}
         currentView={currentView}
         setCurrentView={setCurrentView}

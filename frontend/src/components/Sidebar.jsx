@@ -2,15 +2,7 @@ import React, { useState } from 'react';
 import { Server, Route, LayoutDashboard, ClipboardList, Cpu, Gamepad2, Layers } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
 
-export default function Sidebar({
-    fleetData, 
-    activeBinId, 
-    setActiveBinId, 
-    showRoute, 
-    toggleRoute, 
-    isRouting, 
-    binsNeedingPickup, 
-    getStatusMeaning,
+const Sidebar = React.memo(function Sidebar({
     setIsLoggedIn,
     currentView,
     setCurrentView
@@ -109,4 +101,6 @@ export default function Sidebar({
             />
         </aside>
     );
-}
+});
+
+export default Sidebar;
