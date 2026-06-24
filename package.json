@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Backend Node-RED server for Smart Waste Management System",
   "main": "index.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "start": "node-red --port $PORT --userDir . node_red/flow.json"
   },
